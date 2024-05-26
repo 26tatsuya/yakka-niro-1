@@ -219,6 +219,6 @@ df_deduplicated['経度'] = df_deduplicated['名称'].apply(lambda x: get_geocod
 conn = sqlite3.connect('property.db')
 
 # データフレームをSQLiteテーブルに変換
-df_deduplicated.to_sql('SUUMO&HOMES', conn, if_exists='replace', index=False)
+df_deduplicated.to_sql('SUUMOHOMES', conn, if_exists='replace', index=False)
 
 conn.close()
