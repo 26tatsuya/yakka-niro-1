@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import sqlite3
+import re
 
 base_url = "https://www.homes.co.jp/chintai/tokyo/minato-city/list/?page={}"
 max_page = 5
@@ -192,9 +193,7 @@ print(f"\n削除された重複レコード数: {duplicates_removed}")
 
 df_deduplicated = df_deduplicated.drop(columns=['アドレス_数字除去'])
 
-import pandas as pd
-import requests
-
+# Google geocoding APIを使って「名称」（物件名）から緯度経度を算出
 API_KEY = "AIzaSyAz1DUPKECVOHzYIpjqhglQ_x9jyR1EmpE"
 
 def get_geocode_from_name(name):
