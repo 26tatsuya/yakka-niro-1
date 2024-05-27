@@ -193,6 +193,16 @@ print(f"\n削除された重複レコード数: {duplicates_removed}")
 
 df_deduplicated = df_deduplicated.drop(columns=['アドレス_数字除去'])
 
+# 「家賃」列から万円を削除してobject→floatに変換
+# 変換後に再度データを格納
+def extract_number(x):
+    try:
+        return float(x.split('万円')[0].replace(',',''))
+    except:
+        return np.nan
+
+df_deduplicated['家賃'] = df_deduplicated['家賃'].apply(extract_number).astype(float)
+
 # Google geocoding APIを使って「名称」（物件名）から緯度経度を算出
 API_KEY = "AIzaSyAz1DUPKECVOHzYIpjqhglQ_x9jyR1EmpE"
 

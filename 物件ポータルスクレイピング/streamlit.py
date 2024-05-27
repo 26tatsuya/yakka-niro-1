@@ -24,6 +24,8 @@ def read_data_from_sqlite(db_path='property.db', query='SELECT * FROM SUUMOHOMES
     c.execute(query)
     rows = c.fetchall()
     conn.close()
+    # SQLiteの結果をDataFrameに変換
+    rows = pd.DataFrame(rows,columns=[desc[0] for desc in c.description])
     return rows
 
 # 地図を作成、マーカーを追加する関数
@@ -73,7 +75,7 @@ def main():
 
     with col1:
         # エリア選択
-        area = st.radio('■ エリア選択', rows['区'].unique())
+        area = st.radio('■ エリア選択', ["港区","渋谷区","品川区","大田区"])
     
     with col2:
         # 家賃範囲選択のスライダーをfloat型せ設定し、小数点第一位まで表示
