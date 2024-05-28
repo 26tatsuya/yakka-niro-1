@@ -203,6 +203,15 @@ def extract_number(x):
 
 df_deduplicated['家賃'] = df_deduplicated['家賃'].apply(extract_number).astype(float)
 
+# 東京都を削除して新しい列を作成
+df_deduplicated['アドレス_修正'] = df_deduplicated['アドレス'].str.replace('東京都', '')
+
+# 区の後の文字を削除して新しい列を作成
+df_deduplicated['区'] = df_deduplicated['アドレス_修正'].str.split('区', expand=True)[0]+ '区'
+
+# df_deduplicatedから[アドレス_修正]を削除
+df_deduplicated = df_deduplicated.drop(columns=['アドレス_修正'])
+
 # Google geocoding APIを使って「名称」（物件名）から緯度経度を算出
 API_KEY = "AIzaSyAz1DUPKECVOHzYIpjqhglQ_x9jyR1EmpE"
 
