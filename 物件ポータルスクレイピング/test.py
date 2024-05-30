@@ -3,6 +3,14 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import sqlite3
 import re
+import os
+from dotenv import load_dotenv
+
+# 環境変数の読み込み
+load_dotenv()
+
+# 環境変数から認証情報を取得
+API_KEY = os.getenv("Google_geocoding_API")
 
 base_url = "https://www.homes.co.jp/chintai/tokyo/minato-city/list/?page={}"
 max_page = 5
@@ -203,9 +211,16 @@ def extract_number(x):
 
 df_deduplicated['家賃'] = df_deduplicated['家賃'].apply(extract_number).astype(float)
 
-# Google geocoding APIを使って「名称」（物件名）から緯度経度を算出
-API_KEY = "AIzaSyAz1DUPKECVOHzYIpjqhglQ_x9jyR1EmpE"
+# 東京都を削除して新しい列を作成
+df_deduplicated['アドレス_修正'] = df_deduplicated['アドレス'].str.replace('東京都', '')
 
+# 区の後の文字を削除して新しい列を作成
+df_deduplicated['区'] = df_deduplicated['アドレス_修正'].str.split('区', expand=True)[0]+ '区'
+
+# df_deduplicatedから[アドレス_修正]を削除
+df_deduplicated = df_deduplicated.drop(columns=['アドレス_修正'])
+
+# Google geocoding APIを使って「名称」（物件名）から緯度経度を算出
 def get_geocode_from_name(name):
     address = name.replace(" ", "+")  # 空白をプラスに置き換える
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={API_KEY}"
