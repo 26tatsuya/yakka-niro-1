@@ -79,7 +79,7 @@ def extract_ku(address):
 df['区'] = df['住所'].apply(extract_ku)
 
 # データベース接続を作成
-conn = sqlite3.connect('anytime.db')
+conn = sqlite3.connect('property.db')
 
 # データフレームをSQLiteテーブルに変換
 df.to_sql('anytime', conn, if_exists='replace', index=False)
