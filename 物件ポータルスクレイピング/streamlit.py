@@ -28,8 +28,30 @@ def read_data_from_sqlite(db_path='property.db', query='SELECT * FROM SUUMOHOMES
     rows = pd.DataFrame(rows,columns=[desc[0] for desc in c.description])
     return rows
 
+# ヨガ教室の情報を取得する関数
+def read_yoga_data_from_sqlite(db_path='property.db', query='SELECT * FROM LAVA'):
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    c.execute(query)
+    rows = c.fetchall()
+    conn.close()
+    # SQLiteの結果をDataFrameに変換
+    rows = pd.DataFrame(rows,columns=[desc[0] for desc in c.description])
+    return rows
+
+# ジムの情報を取得する関数
+def read_gym_data_from_sqlite(db_path='property.db', query='SELECT * FROM anytime'):
+    conn = sqlite3.connect(db_path)
+    c = conn.cursor()
+    c.execute(query)
+    rows = c.fetchall()
+    conn.close()
+    # SQLiteの結果をDataFrameに変換
+    rows = pd.DataFrame(rows,columns=[desc[0] for desc in c.description])
+    return rows
+
 # 地図を作成、マーカーを追加する関数
-def create_map(filtered_rows):
+def create_map(filtered_rows, yoga_rows, gym_rows):
     # 地図の初期設定
     map_center = [filtered_rows['緯度'].mean(), filtered_rows['経度'].mean()]
     m = folium.Map(location = map_center, zoom_start=12)
@@ -49,9 +71,46 @@ def create_map(filtered_rows):
             popup = folium.Popup(popup_html, max_width=400)
             folium.Marker(
                 [row['緯度'], row['経度']],
-                popup = popup
+                popup = popup,
+                icon=folium.Icon(icon="home",icon_color="white", color="red")
             ).add_to(m)
     
+    # マーカーを追加（ヨガ教室）
+    for idx, row in yoga_rows.iterrows():
+        if (yoga_rows['緯度'].notnull()).any() and (yoga_rows['経度'].notnull()).any():
+            # ポップアップに表示するHTMLコンテンツを作成
+            popup_html = f"""
+            <b>名称:</b> {row['店舗名']}<br>
+            <b>アドレス:</b> {row['住所']}<br>
+            <a href="{row['リンク']}" target="_blank">店舗詳細</a>
+            """
+
+            # HTMLをポップアップに設定
+            popup = folium.Popup(popup_html, max_width=400)
+            folium.Marker(
+                [row['緯度'], row['経度']],
+                popup = popup,
+                icon=folium.Icon(icon="heart",icon_color="white", color="orange") 
+            ).add_to(m)
+
+    # マーカーを追加（ジム）
+    for idx, row in gym_rows.iterrows():
+        if (gym_rows['緯度'].notnull()).any() and (gym_rows['経度'].notnull()).any():
+            # ポップアップに表示するHTMLコンテンツを作成
+            popup_html = f"""
+            <b>名称:</b> {row['店舗名']}<br>
+            <b>アドレス:</b> {row['住所']}<br>
+            <a href="{row['リンク']}" target="_blank">店舗詳細</a>
+            """
+
+            # HTMLをポップアップに設定
+            popup = folium.Popup(popup_html, max_width=400)
+            folium.Marker(
+                [row['緯度'], row['経度']],
+                popup = popup,
+                icon=folium.Icon(icon="star",icon_color="white", color="darkpurple") 
+            ).add_to(m)
+
     return m
 
 # 検索結果を表示する関数
@@ -66,6 +125,8 @@ def display_search_results(filtered_rows):
 # メインのアプリケーション
 def main():
     rows = read_data_from_sqlite()
+    yoga_rows = read_yoga_data_from_sqlite()
+    gym_rows = read_gym_data_from_sqlite()
 
     # StreamlitのUI要素（スライダー、ボタンなど）の各表示設定
     st.title('賃貸物件情報の可視化')
@@ -89,8 +150,10 @@ def main():
         )
 
     with col2:
-        # 間取り選択のデフォルト値をすべてに設定
-        type_options = st.multiselect('■ 間取り選択', rows['間取り'].unique(), default=rows['間取り'].unique())
+        # 間取り選択のデフォルト値を2LDKと3LDKに設定
+        default_options = ['2LDK', '3LDK']
+        available_options = rows['間取り'].unique()
+        type_options = st.multiselect('■ 間取り選択', available_options, default=[opt for opt in default_options if opt in available_options])
     
     # フィルタリング/フィルタリングされたデータフレームの件数を取得
     filtered_rows = rows[(rows['区'].isin([area])) & (rows['間取り'].isin(type_options))]
@@ -101,6 +164,18 @@ def main():
     filtered_rows['緯度'] = pd.to_numeric(filtered_rows['緯度'], errors='coerce')
     filtered_rows['経度'] = pd.to_numeric(filtered_rows['経度'], errors='coerce')
     filtered_rows2 = filtered_rows.dropna(subset=['緯度', '経度'])
+
+    # ヨガ教室のデータもフィルタリング
+    filtered_yoga_rows = yoga_rows[yoga_rows['区'].isin([area])]
+    filtered_yoga_rows['緯度'] = pd.to_numeric(filtered_yoga_rows['緯度'], errors='coerce')
+    filtered_yoga_rows['経度'] = pd.to_numeric(filtered_yoga_rows['経度'], errors='coerce')
+    filtered_yoga_rows = filtered_yoga_rows.dropna(subset=['緯度', '経度'])
+
+    # ジムのデータもフィルタリング
+    filtered_gym_rows = gym_rows[gym_rows['区'].isin([area])]
+    filtered_gym_rows['緯度'] = pd.to_numeric(filtered_gym_rows['緯度'], errors='coerce')
+    filtered_gym_rows['経度'] = pd.to_numeric(filtered_gym_rows['経度'], errors='coerce')
+    filtered_gym_rows = filtered_gym_rows.dropna(subset=['緯度', '経度'])
 
 
     # 検索ボタン/ フィルタリングされたデータフレーム件数を表示
@@ -114,11 +189,13 @@ def main():
         # 検索ボタンが押された場合、セッションステートに結果を保存
         st.session_state['filtered_rows'] = filtered_rows
         st.session_state['filtered_rows2'] = filtered_rows2
+        st.session_state['filtered_yoga_rows'] = filtered_yoga_rows
+        st.session_state['filtered_gym_rows'] = filtered_gym_rows
         st.session_state['search_clicked'] = True
     
     # streamlitに地図を表示
     if st.session_state.get('search_clicked', False):
-        m = create_map(st.session_state.get('filtered_rows2', filtered_rows2))
+        m = create_map(st.session_state.get('filtered_rows2', filtered_rows2), st.session_state.get('filtered_yoga_rows', filtered_yoga_rows), st.session_state.get('filtered_gym_rows', filtered_gym_rows))
         folium_static(m)
 
     # 地図の下にラジオボタンを配置し、選択したオプションに応じて表示を切り替える
