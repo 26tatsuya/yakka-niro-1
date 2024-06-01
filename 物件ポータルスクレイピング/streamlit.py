@@ -113,15 +113,19 @@ def create_map(filtered_rows, yoga_rows, gym_rows):
 
     return m
 
+# 検索結果の"物件詳細URL"のリンクを表示させるために関数を定義
+def make_clickable(url, name):
+    return f'<a target="_blank" href="{url}">{name}</a>'
+
 # 検索結果を表示する関数
 def display_search_results(filtered_rows):
     # 物件番号を含む新しい列を作成
     filtered_rows['物件番号'] = range(1, len(filtered_rows)+1)
-    filtered_rows['物件詳細URL'] = '[リンク](' + filtered_rows['物件詳細URL'] + ')'
+    filtered_rows['物件詳細URL'] = filtered_rows['物件詳細URL'].apply(lambda x: make_clickable(x,"リンク"))
     display_columns = ['物件番号','名称','アドレス','階数', '家賃', '間取り','物件詳細URL']
     filtered_rows_display = filtered_rows[display_columns]
     st.markdown(filtered_rows_display.to_html(escape=False, index=False), unsafe_allow_html=True)
-
+    
 # メインのアプリケーション
 def main():
     rows = read_data_from_sqlite()
