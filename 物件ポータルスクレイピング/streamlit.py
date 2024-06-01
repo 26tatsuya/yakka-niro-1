@@ -117,7 +117,9 @@ def create_map(filtered_rows, yoga_rows, gym_rows):
 def display_search_results(filtered_rows):
     # 物件番号を含む新しい列を作成
     filtered_rows['物件番号'] = range(1, len(filtered_rows)+1)
-    filtered_rows['物件詳細URL'] = '[リンク](' + filtered_rows['物件詳細URL'] + ')'
+    # 既にHTMLリンクが生成されていない場合のみ生成
+    if not filtered_rows['物件詳細URL'].str.contains('<a href').any():
+        filtered_rows['物件詳細URL'] = filtered_rows['物件詳細URL'].apply(lambda x: f'<a href="{x}" target="_blank">リンク</a>')
     display_columns = ['物件番号','名称','アドレス','階数', '家賃', '間取り','物件詳細URL']
     filtered_rows_display = filtered_rows[display_columns]
     st.markdown(filtered_rows_display.to_html(escape=False, index=False), unsafe_allow_html=True)
@@ -129,7 +131,7 @@ def main():
     gym_rows = read_gym_data_from_sqlite()
 
     # StreamlitのUI要素（スライダー、ボタンなど）の各表示設定
-    st.title('賃貸物件情報の可視化')
+    st.title('FitHome Search')
 
     # エリアと家賃フィルターバーを1:2の割合で分割
     col1, col2 = st.columns([1,2])
@@ -143,8 +145,8 @@ def main():
         price_min, price_max = st.slider(
             '■ 家賃範囲（万円）',
             min_value=float(1),
-            max_value=float(rows['家賃'].max()),
-            value=(float(rows['家賃'].min()), float(rows['家賃'].max())),
+            max_value=float(50),  # 最大値を50に設定
+            value=(10.0, 30.0),  # デフォルトを10万円〜30万円に設定
             step=0.1,
             format='%.1f'
         )
