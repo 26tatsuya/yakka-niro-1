@@ -121,13 +121,7 @@ def make_clickable(url, name):
 def display_search_results(filtered_rows):
     # 物件番号を含む新しい列を作成
     filtered_rows['物件番号'] = range(1, len(filtered_rows)+1)
-<<<<<<< HEAD
     filtered_rows['物件詳細URL'] = filtered_rows['物件詳細URL'].apply(lambda x: make_clickable(x,"リンク"))
-=======
-    # 既にHTMLリンクが生成されていない場合のみ生成
-    if not filtered_rows['物件詳細URL'].str.contains('<a href').any():
-        filtered_rows['物件詳細URL'] = filtered_rows['物件詳細URL'].apply(lambda x: f'<a href="{x}" target="_blank">リンク</a>')
->>>>>>> 7dd6512a03cecc432cf82b9ca750b90356db5d91
     display_columns = ['物件番号','名称','アドレス','階数', '家賃', '間取り','物件詳細URL']
     filtered_rows_display = filtered_rows[display_columns]
     st.markdown(filtered_rows_display.to_html(escape=False, index=False), unsafe_allow_html=True)
