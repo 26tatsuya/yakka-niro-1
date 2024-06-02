@@ -22,8 +22,11 @@ if 'show_all' not in st.session_state:
 def toggle_show_all():
     st.session_state['show_all'] = not st.session_state['show_all']
 
-# SQLiteからデータを読み込む関数
-db_path = 'property.db'
+# 現在のファイルディレクトリの情報を取得
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 上記を基準として、データベースファイルへのパスを通す
+db_path = os.path.join(current_dir, 'property.db')
 query = 'SELECT * FROM SUUMOHOMES'
 def read_data_from_sqlite(db_path='property.db', query='SELECT * FROM SUUMOHOMES'):
     conn = sqlite3.connect(db_path)
