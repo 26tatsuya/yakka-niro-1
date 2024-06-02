@@ -6,6 +6,13 @@ import sqlite3
 from geopy.geocoders import Nominatim
 import folium
 from streamlit_folium import folium_static
+import stat
+
+# データベース初期化スクリプトのインポート
+from init_db import initialize_db
+
+# データベースを初期化
+initialize_db()
 
 # セッション状態の初期化
 if 'show_all' not in st.session_state:
