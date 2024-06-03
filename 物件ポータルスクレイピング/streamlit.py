@@ -39,6 +39,8 @@ def read_data_from_sqlite(db_path='property.db', query='SELECT * FROM SUUMOHOMES
     return rows
 
 # ヨガ教室の情報を取得する関数
+db_path = os.path.join(current_dir, 'property.db')
+query = 'SELECT * FROM LAVA'
 def read_yoga_data_from_sqlite(db_path='property.db', query='SELECT * FROM LAVA'):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
@@ -50,6 +52,8 @@ def read_yoga_data_from_sqlite(db_path='property.db', query='SELECT * FROM LAVA'
     return rows
 
 # ジムの情報を取得する関数
+db_path = os.path.join(current_dir, 'property.db')
+query = 'SELECT * FROM anytime'
 def read_gym_data_from_sqlite(db_path='property.db', query='SELECT * FROM anytime'):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
