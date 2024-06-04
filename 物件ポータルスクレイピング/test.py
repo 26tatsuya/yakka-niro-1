@@ -162,14 +162,14 @@ for page in range(1, max_page + 1):
             data["面積"]   = tbody.select_one(".cassetteitem_menseki").get_text(strip=True) if tbody.select_one(".cassetteitem_menseki") else None
 
             # 物件画像・間取り画像・詳細URLの取得を最後に行う
-            property_image_element = item.find(class_="cassetteitem_object-item")
+            property_image_element = tbody.find(class_="cassetteitem_object-item")
             data["物件画像URL"] = property_image_element.img["rel"] if property_image_element and property_image_element.img else None
 
-            floor_plan_image_element = item.find(class_="casssetteitem_other-thumbnail")
+            floor_plan_image_element = tbody.find(class_="casssetteitem_other-thumbnail")
             data["間取画像URL"] = floor_plan_image_element.img["rel"] if floor_plan_image_element and floor_plan_image_element.img else None
 
-            property_link_element = item.select_one("a[href*='/chintai/jnc_']")
-            data["物件詳細URL"] = "https://suumo.jp/jj/chintai/ichiran/FR301FC001/?ar=030&bs=040&pc=30&smk=&po1=25&po2=99&shkr1=03&shkr2=03&shkr3=03&shkr4=03&sc=13103&sc=13113&sc=13109&sc=13111&ta=13&cb=0.0&ct=9999999&et=9999999&mb=0&mt=9999999&cn=30&fw2=" +property_link_element['href'] if property_link_element else None ## 不動産サイトから詳細URLリンクを読み解き作成
+            property_link_element = tbody.select_one("a[href*='/chintai/jnc_']")
+            data["物件詳細URL"] = "https://suumo.jp" +property_link_element['href'] if property_link_element else None ## 不動産サイトから詳細URLリンクを読み解き作成
 
             all_data.append(data)
 
