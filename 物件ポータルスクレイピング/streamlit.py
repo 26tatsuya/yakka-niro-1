@@ -22,6 +22,24 @@ if 'show_all' not in st.session_state:
 def toggle_show_all():
     st.session_state['show_all'] = not st.session_state['show_all']
 
+# データベースファイルのパスを確認して権限を設定する関数
+def check_and_set_permissions(db_path):
+    if not os.path.exists(db_path):
+        st.write(f"Database file does not exist at {db_path}")
+        return False
+    else:
+        # デバッグ情報の表示をコメントアウト
+        # st.write(f"Database file found at {db_path}")
+        
+        # ファイルの権限を確認
+        file_permissions = os.stat(db_path).st_mode
+        # st.write(f"File permissions: {oct(file_permissions)}")
+        
+        # 読み取り/書き込み権限を設定
+        os.chmod(db_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP)
+        # st.write(f"Updated file permissions: {oct(os.stat(db_path).st_mode)}")
+        return True
+
 # 現在のファイルディレクトリの情報を取得
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
