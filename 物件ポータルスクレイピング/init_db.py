@@ -13,7 +13,8 @@ def initialize_db(db_path='property.db'):
         家賃 REAL,
         物件詳細URL TEXT,
         緯度 REAL,
-        経度 REAL
+        経度 REAL,
+        間取り TEXT
     )
     ''')
 
