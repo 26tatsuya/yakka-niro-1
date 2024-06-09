@@ -46,7 +46,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # 上記を基準として、データベースファイルへのパスを通す
 db_path = os.path.join(current_dir, 'property.db')
 query = 'SELECT * FROM SUUMOHOMES'
-def read_data_from_sqlite(db_path='property.db', query='SELECT * FROM SUUMOHOMES'):
+def read_data_from_sqlite(db_path=db_path, query='SELECT * FROM SUUMOHOMES'):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(query)
@@ -56,10 +56,13 @@ def read_data_from_sqlite(db_path='property.db', query='SELECT * FROM SUUMOHOMES
     rows = pd.DataFrame(rows,columns=[desc[0] for desc in c.description])
     return rows
 
+# 現在のファイルディレクトリの情報を取得
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
 # ヨガ教室の情報を取得する関数
 db_path = os.path.join(current_dir, 'property.db')
 query = 'SELECT * FROM LAVA'
-def read_yoga_data_from_sqlite(db_path='property.db', query='SELECT * FROM LAVA'):
+def read_yoga_data_from_sqlite(db_path=db_path, query='SELECT * FROM LAVA'):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(query)
@@ -72,7 +75,7 @@ def read_yoga_data_from_sqlite(db_path='property.db', query='SELECT * FROM LAVA'
 # ジムの情報を取得する関数
 db_path = os.path.join(current_dir, 'property.db')
 query = 'SELECT * FROM anytime'
-def read_gym_data_from_sqlite(db_path='property.db', query='SELECT * FROM anytime'):
+def read_gym_data_from_sqlite(db_path=db_path, query='SELECT * FROM anytime'):
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
     c.execute(query)
